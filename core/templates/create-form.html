@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Create a new form{% endblock %}
+{% block styles %}
+<style>
+    /*md: 768px*/
+    @media(min-width: 768px){
+      .layout{
+        display:grid; 
+        grid-template-columns:repeat(2, minmax(0, 50%)); 
+        align-items:flex-start;
+        gap:0.5rem;
+      }
+
+     .layout > div{
+        min-height: 250px;
+     }
+    
+    }
+
+    a{
+        text-decoration:none;
+        color:currentColor;
+    }
+
+</style>
+{% endblock %}
+{% block main_content %}
+<main class="p-2">
+    <h1 class="text-center fw-bold">Create Your Form</h1>
+    <div class="layout">
+        <div class="border rounded p-1">
+            <h2 class="text-center fw-bold">Form Preview</h2>
+            <div id="root">
+
+            </div>
+        </div>
+
+        <div class="p-2 d-flex justify-content-center align-items-center border rounded">
+            <div class="m-2">
+                <button class="btn btn-primary" onclick="addTextInput()">text input</button>
+            </div>
+            <div class="m-2">
+                <button class="btn btn-primary" onclick="addTextArea()">text area</button>
+            </div>
+            <div class="m-2">
+                <button class="btn btn-success" onclick="done()">done</button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+{% block scripts %}
+  <script>
+        const fields = [];
+        const map = new Map(); 
+        let fieldId = 1;
+
+        const addTextInput = () => {
+            const textInputParent = document.createElement('div');
+            textInputParent.className = 'm-2'
+            textInputParent.innerHTML = `
+               <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
+               <input type="text" id="field-${fieldId}" class="form-control field">
+               `;
+            document.getElementById('root').appendChild(textInputParent);
+            fieldId++;
+        }; 
+
+        const addTextArea =  () => {
+            const textAreaParent = document.createElement('div');
+            textAreaParent.className = 'm-2';
+            textAreaParent.innerHTML = `
+               <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
+               <textarea name="" class="form-control field" id="field-${fieldId}" cols="30" rows="10"></textarea>
+               `;
+            document.getElementById('root').appendChild(textAreaParent);
+            fieldId++
+        }; 
+
+        const done = () => {
+            const formTemplate = {};
+            const labels = document.querySelectorAll('label'); 
+            const fields = document.querySelectorAll('.field');
+            for(let i=0; i < labels.length; i++){
+                let key = labels[i].innerHTML; 
+                let value = fields[i].value;
+                formTemplate[key] = value;  
+            }
+            //console.log(formTemplate);
+        };
+  </script>
+{% endblock %}

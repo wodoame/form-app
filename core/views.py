@@ -55,3 +55,7 @@ def home(request):
     if request.method == 'POST': 
         print(request.POST) 
     return render(request, 'index.html', {})
+
+
+def createForm(request): 
+    return render(request, 'create-form.html', {})

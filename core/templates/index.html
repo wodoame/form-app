@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        @font-face {
+            font-family: 'Poppins-regular';
+            src: url("{% static 'fonts/Poppins-Regular.ttf' %}");
+        }
+    
+        body{
+            font-family:'Poppins-regular';
+        }
+    </style>
 </head>
 <body>
     <div class="p-3 mx-auto w-50">
@@ -34,7 +44,6 @@
                 }
                 // console.log(form_field);
                 document.getElementById('root').appendChild(form_field);
-
             }
         };
 
