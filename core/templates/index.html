@@ -37,13 +37,19 @@
     <script>
         const createForm = (form) => {
             for(let field of form){
-               let form_field = document.createElement(field.tag_name); 
+               let fieldParent = document.createElement('div'); 
+               fieldParent.className = 'm-2'
+               fieldParent.innerHTML =   `
+                <label class="p-1 fw-bold">${field.labelName}</label>
+               `; 
+               let form_field = document.createElement(field.tagName); 
                let attrs = field.attributes; 
                 for(let attribute in attrs){
                     form_field.setAttribute(attribute, attrs[attribute]);
                 }
                 // console.log(form_field);
-                document.getElementById('root').appendChild(form_field);
+                fieldParent.append(form_field);
+                document.getElementById('root').insertAdjacentElement('beforeend', fieldParent);
             }
         };
 

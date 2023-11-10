@@ -1,55 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import VirtualForm
 from django.http import JsonResponse, HttpResponse
 import json
 
 def index(request):
-    
-    fields = [
-        {
-            'field_name': 'Name', 
-            'tag_name':'input', 
-            'attributes':{
-                'class':'form-control m-2',
-                'type': 'text', 
-                'name':'name'
-            }
-         },
-        {
-            'field_name': 'Age', 
-            'tag_name':'input', 
-            'attributes':{
-                'class':'form-control is-valid m-2',
-                'type': 'number', 
-                'name':'age'
-            }
-         },
-        {
-            'field_name': 'Comment', 
-            'tag_name':'textarea', 
-            'attributes':{
-                'class':'form-control m-2',
-                'cols':'30', 
-                'rows': '10', 
-                'name': 'comment'
-            }
-         },
-        {
-            'field_name': 'country', 
-            'tag_name':'input', 
-            'attributes':{
-                'class':'form-control m-2',
-                'type':'text', 
-            }
-         },
-    ]
-    
-    # data = json.dumps(fields)
-    # print(data)
-    
-    # form = VirtualForm.objects.create(title='test form 1', form_fields=fields)
-    return JsonResponse(data=fields, safe=False, status=200)
-    
+    if request.method == 'POST': 
+        form_fields = json.dumps(json.loads(request.body)) # To convert to a json string for storage in the database
+        VirtualForm.objects.create(title='Test Form', form_fields=form_fields)
+    formData = json.loads(VirtualForm.objects.last().form_fields)
+    return JsonResponse(data=formData, safe=False)
 
 def home(request): 
     if request.method == 'POST': 

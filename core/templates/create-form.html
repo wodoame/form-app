@@ -28,12 +28,13 @@
 <main class="p-2">
     <h1 class="text-center fw-bold">Create Your Form</h1>
     <div class="layout">
-        <div class="border rounded p-1">
+        <form class="border rounded p-1">
+            {% csrf_token %}
             <h2 class="text-center fw-bold">Form Preview</h2>
             <div id="root">
 
             </div>
-        </div>
+        </form>
 
         <div class="p-2 d-flex justify-content-center align-items-center border rounded">
             <div class="m-2">
@@ -51,42 +52,61 @@
 {% endblock %}
 {% block scripts %}
   <script>
-        const fields = [];
-        const map = new Map(); 
+       
         let fieldId = 1;
 
         const addTextInput = () => {
-            const textInputParent = document.createElement('div');
-            textInputParent.className = 'm-2'
-            textInputParent.innerHTML = `
-               <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
-               <input type="text" id="field-${fieldId}" class="form-control field">
-               `;
-            document.getElementById('root').appendChild(textInputParent);
+            const htmlContent = `
+            <div class="m-2" id="inputParent">
+                <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
+                <input type="text" id="field-${fieldId}" class="form-control field">
+            </div>
+            `;
+            document.getElementById('root').insertAdjacentHTML('beforeend', htmlContent);
             fieldId++;
         }; 
 
         const addTextArea =  () => {
-            const textAreaParent = document.createElement('div');
-            textAreaParent.className = 'm-2';
-            textAreaParent.innerHTML = `
-               <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
-               <textarea name="" class="form-control field" id="field-${fieldId}" cols="30" rows="10"></textarea>
-               `;
-            document.getElementById('root').appendChild(textAreaParent);
-            fieldId++
-        }; 
+               const htmlContent = `
+               <div class="m-2" id="inputParent">
+                   <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
+                   <textarea name="" class="form-control field" id="field-${fieldId}" cols="30" rows="10"></textarea>
+                </div>
+                `;
+                document.getElementById('root').insertAdjacentHTML('beforeend', htmlContent);
+                fieldId++; 
+           }; 
 
         const done = () => {
-            const formTemplate = {};
-            const labels = document.querySelectorAll('label'); 
-            const fields = document.querySelectorAll('.field');
-            for(let i=0; i < labels.length; i++){
-                let key = labels[i].innerHTML; 
-                let value = fields[i].value;
-                formTemplate[key] = value;  
-            }
-            //console.log(formTemplate);
+            const fields = [];
+
+            const inputParents = document.querySelectorAll('#inputParent'); 
+            inputParents.forEach((inputParent)=>{
+                const field = inputParent.querySelector('.field');
+                const label = inputParent.querySelector('label');
+                const fieldData = {'tagName':field.tagName.toLocaleLowerCase(), 'labelName':label.innerHTML, 'attributes': {}};
+
+               const fieldAttributes = field.attributes; 
+               const attributeList = []; 
+               for(let attribute of fieldAttributes){
+                    fieldData.attributes[attribute.name] = attribute.value; // populating the attributes object in fieldData
+               }
+
+               //console.log(fieldData);
+               fields.push(fieldData);
+            });
+            console.log(document.querySelector('input[name=csrfmiddlewaretoken]').value);
+            console.log(fields);
+            console.log(JSON.stringify(fields));
+            fetch(`{% url 'index' %}`, {
+                method:'POST',
+                headers: {
+                      'Content-Type':'application/json',
+                      'X-CSRFToken':document.querySelector('input[name=csrfmiddlewaretoken]').value
+                }, 
+                body:JSON.stringify(fields)
+            })
+            // no response is required
         };
   </script>
 {% endblock %}
