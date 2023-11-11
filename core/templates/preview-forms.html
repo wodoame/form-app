@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Your forms{% endblock %}
+{%  block styles %}
+  <style>
+     a{
+        text-decoration: none;
+        color: #000;
+     }
+
+     ul{
+        list-style: none;
+        padding:0;
+     }
+  </style>
+{% endblock %}
+{%  block main_content %}
+<div class="p-2">
+        <h3>Your Forms</h3>
+    {% for form in forms %}
+        <ul>
+            <li>
+                <a href="{% url 'show-form' form.id %}">{{form.title}}</a>
+            </li>
+        </ul>
+    {% endfor %}
+</div>
+  
+{% endblock  %}
+{%  block scripts %}
+<!-- <script>
+    
+    const formFieldDatas = document.querySelectorAll('.form-field-data') // the information about the various forms
+    formFieldDatas.forEach((form)=>{
+        const title = form.querySelector('.form-title').innerHTML; 
+        const fields = JSON.parse(form.querySelector('input').value); 
+        const outer = document.createElement('div'); // the div that forms part of the grid layout
+        const inner = document.createElement('div'); // this div contains the form layout
+        outer.innerHTML = `<h3>${title}</h3>`; // initializing the div with some heading
+        inner.className= 'm-2'
+        
+        for(let field of fields){
+            let inputRow = document.createElement('div'); // this div is just each row of the form
+            inputRow.innerHTML =  `
+             <label class="p-1 fw-bold">${field.labelName}</label>
+            `; 
+            let form_field = document.createElement(field.tagName); 
+            let attrs = field.attributes; 
+             for(let attribute in attrs){
+                 form_field.setAttribute(attribute, attrs[attribute]);
+             }
+             // console.log(form_field);
+            inputRow.append(form_field);
+            inner.append(inputRow);
+        }
+        outer.append(inner); 
+        document.getElementById('root').insertAdjacentElement('beforeend', outer);
+    })
+</script> -->
+{% endblock %}

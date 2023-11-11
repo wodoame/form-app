@@ -30,7 +30,11 @@
     <div class="layout">
         <form class="border rounded p-1">
             {% csrf_token %}
-            <h2 class="text-center fw-bold">Form Preview</h2>
+            <div class="d-flex justify-content-center">
+                <div contenteditable id="form-title" class="p-1">
+                    Form Title
+                </div>
+            </div>
             <div id="root">
 
             </div>
@@ -38,17 +42,24 @@
 
         <div class="p-2 d-flex justify-content-center align-items-center border rounded">
             <div class="m-2">
-                <button class="btn btn-primary" onclick="addTextInput()">text input</button>
+                <button class="btn btn-primary btn-sm" onclick="addTextInput()">text input</button>
             </div>
             <div class="m-2">
-                <button class="btn btn-primary" onclick="addTextArea()">text area</button>
+                <button class="btn btn-primary btn-sm" onclick="addTextArea()">text area</button>
             </div>
             <div class="m-2">
-                <button class="btn btn-success" onclick="done()">done</button>
+                <button class="btn btn-primary btn-sm" onclick="addNumberInput()">number input</button>
+            </div>
+            <div class="m-2">
+                <button class="btn btn-success btn-sm" onclick="done()">done</button>
             </div>
         </div>
     </div>
 </main>
+
+<div class="visually-hidden">
+    <a href="{% url 'preview-forms' %}" id="preview-forms-link"></a>
+</div>
 {% endblock %}
 {% block scripts %}
   <script>
@@ -59,7 +70,17 @@
             const htmlContent = `
             <div class="m-2" id="inputParent">
                 <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
-                <input type="text" id="field-${fieldId}" class="form-control field">
+                <input type="text"  name="field-${fieldId}" id="field-${fieldId}" class="form-control field">
+            </div>
+            `;
+            document.getElementById('root').insertAdjacentHTML('beforeend', htmlContent);
+            fieldId++;
+        }; 
+        const addNumberInput = () => {
+            const htmlContent = `
+            <div class="m-2" id="inputParent">
+                <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
+                <input type="number"  name="field-${fieldId}" id="field-${fieldId}" class="form-control field">
             </div>
             `;
             document.getElementById('root').insertAdjacentHTML('beforeend', htmlContent);
@@ -70,7 +91,7 @@
                const htmlContent = `
                <div class="m-2" id="inputParent">
                    <label class="m-2 fw-bold p-1" contenteditable>Enter your label here</label>
-                   <textarea name="" class="form-control field" id="field-${fieldId}" cols="30" rows="10"></textarea>
+                   <textarea name="field-${fieldId}" class="form-control field" id="field-${fieldId}" cols="30" rows="10"></textarea>
                 </div>
                 `;
                 document.getElementById('root').insertAdjacentHTML('beforeend', htmlContent);
@@ -78,8 +99,9 @@
            }; 
 
         const done = () => {
+            const formData = {'form_title': document.getElementById('form-title').innerHTML}
             const fields = [];
-
+            
             const inputParents = document.querySelectorAll('#inputParent'); 
             inputParents.forEach((inputParent)=>{
                 const field = inputParent.querySelector('.field');
@@ -87,7 +109,6 @@
                 const fieldData = {'tagName':field.tagName.toLocaleLowerCase(), 'labelName':label.innerHTML, 'attributes': {}};
 
                const fieldAttributes = field.attributes; 
-               const attributeList = []; 
                for(let attribute of fieldAttributes){
                     fieldData.attributes[attribute.name] = attribute.value; // populating the attributes object in fieldData
                }
@@ -95,17 +116,21 @@
                //console.log(fieldData);
                fields.push(fieldData);
             });
-            console.log(document.querySelector('input[name=csrfmiddlewaretoken]').value);
-            console.log(fields);
-            console.log(JSON.stringify(fields));
+
+            formData['fields'] = fields; 
+            //console.log(document.querySelector('input[name=csrfmiddlewaretoken]').value);
+            //console.log(fields);
+            //console.log(JSON.stringify(fields));
             fetch(`{% url 'index' %}`, {
                 method:'POST',
                 headers: {
                       'Content-Type':'application/json',
                       'X-CSRFToken':document.querySelector('input[name=csrfmiddlewaretoken]').value
                 }, 
-                body:JSON.stringify(fields)
+                body:JSON.stringify(formData)
             })
+
+            document.getElementById('preview-forms-link').click();
             // no response is required
         };
   </script>
